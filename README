@@ -1,0 +1,7 @@
+International Course on Computational Physics
+Project 2: Ising model
+
+folders:
+-code, contains the Fortran90 code for the project
+-report, contains the LaTeX files for the report
+ -report/images, contains images for the report
