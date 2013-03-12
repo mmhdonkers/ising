@@ -1,3 +1,5 @@
 *.[oa]
 *~
+*.aux
+*.log
 code/run
