@@ -35,10 +35,12 @@
 
 program firstproj
  
+  use plplot
+
   implicit none
 
 !! INPUT: Final temperature (Kelvin), row and column size, step of temperature loop
-  real,parameter :: T = 30.
+  real,parameter :: T = 3d0
   integer,parameter :: rowsize = 10
   integer,parameter :: colsize = 10
   real, parameter :: step =.01
@@ -57,13 +59,14 @@ program firstproj
 !!!!!!!!!!! STORE MAGNETIZATION AS A FUNCTION OF TEMPERATURE
 !  real, dimension(0:T/step) :: mag_temp
 
-
+  real(8) :: rand
 
 !! Initialize Configuration (spin up = 1, spin down = -1)
 
   do i=0,rowsize-1
     do j=0,colsize-1
-        spin(i,j) = 1.
+        call random_number(rand)
+        spin(i,j) = 2 * nint(rand) - 1
      end do
   end do
 
@@ -86,7 +89,7 @@ program firstproj
 
 !!!!!!!!!!++++++++++++++++++++ CONVERGING DO LOOP
 
-  do while (count .LE. T)
+  do while (count .LE. 10)
     call mainloop(spin, rowsize, colsize, T, mag)
 
 !    magtol(i)=mag  !!!!!!!!!!!!! MAJOR SEG FAULT HERE!!!!!!!!
@@ -143,45 +146,45 @@ subroutine mainloop(spin, rowsize, colsize, T, mag)
 
 !! Calculate energy due to the neighbors (if statement takes into account free boundaries)
 
-  sl = spin(ix-1, iy)
-  sr = spin(ix+1, iy)
-  st = spin(ix, iy-1)
-  sb = spin(ix, iy+1)
+  sl = spin(modulo(ix-1,rowsize), iy)
+  sr = spin(modulo(ix+1,rowsize), iy)
+  st = spin(ix, modulo(iy-1,colsize))
+  sb = spin(ix, modulo(iy+1,colsize))
 
-  if (ix .EQ. 0) sl = 0
-  if (ix .EQ. rowsize) sr = 0
-  if (iy .EQ. 0) st = 0
-  if (iy .EQ. colsize) sb = 0
+!  if (ix .EQ. 0) sl = 0
+!  if (ix .EQ. rowsize) sr = 0
+!  if (iy .EQ. 0) st = 0
+!  if (iy .EQ. colsize) sb = 0
 
   neighbors = sl + sr + st + sb
 
 
 !! Calculate energy of old spin
 
-  if (oldsp .EQ. 1) then
-     eold = 1
-  elseif (oldsp .EQ. -1) then
-     eold = -1
-  else
-     print*, 'At least one oldsp is neither up nor down.'
-  endif
+!  if (oldsp .EQ. 1) then
+!     eold = 1
+!  elseif (oldsp .EQ. -1) then
+!     eold = -1
+!  else
+!     print*, 'At least one oldsp is neither up nor down.'
+!  endif
      
 
 !! Choose new spin & calculate energy of new spin
 
-  newsp = -oldsp
+!  newsp = -oldsp
 
-  if (newsp == 1) then
-     enew = 1
-  elseif (newsp == -1) then
-     enew = -1
-  endif
+!  if (newsp == 1) then
+!     enew = 1
+!  elseif (newsp == -1) then
+!     enew = -1
+!  endif
     
 
 
 !! Calculate energy difference between old and new spins
 
-  ediff = (enew - eold)*neighbors
+  ediff = (-oldsp - oldsp)*neighbors
 
 
 
@@ -201,23 +204,23 @@ subroutine mainloop(spin, rowsize, colsize, T, mag)
 
 !! Calculate averages (first initialize counters)
 
-  totup = 0
-  totup = 0
+  totup = sum(spin)
+!  totup = 0
  
-  do i=0,rowsize-1
-    do j=0,colsize-1
+!  do i=0,rowsize-1
+!    do j=0,colsize-1
 
-      if (spin(i,j) == 1) then
-        totup = totup + 1
-      elseif (spin(i,j) == -1) then
-         totdown = totdown + 1
-      else
-         print*, 'At least one spin is neither up nor down'
-      endif
+!      if (spin(i,j) == 1) then
+!        totup = totup + 1
+!      elseif (spin(i,j) == -1) then
+!         totdown = totdown + 1
+!      else
+!         print*, 'At least one spin is neither up nor down'
+!      endif
 
-     end do
-  end do
+!     end do
+!  end do
 
-  mag = (totup - totdown)/(rowsize*colsize)
+  mag = (totup)/(rowsize*colsize)
 
 end subroutine mainloop
