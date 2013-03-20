@@ -41,14 +41,15 @@ program ising
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Declarations !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-!! INPUT: Final temperature (Kelvin), final time, row and column size, stepsize loops
+!! INPUT: Final temperature (Kelvin x 10), final time, row and column size, stepsize loops
   integer,parameter :: tempfinal = 40, timefinal = 100000, size = 20
-  real(8),parameter :: tempstep = 0.1, timestep = 1
+  integer,parameter :: tempstep = 1, timestep = 1
 
 
 !! fortran begins indexing from 1. Start it from 0 because the rand() starts from 0
   integer :: spin(0:size-1,0:size-1)
-  real(8) :: mag, temp, time
+  real(8) :: mag
+  integer :: temp, time
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Main Body !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -71,15 +72,15 @@ program ising
 !    weight = 10*(/-8,-4,0,4,8/)/tempcount
 
     do time = 0,timefinal,timestep
-        call metropolis(spin, size, temp, mag)
+        call metropolis(spin, size, temp/10d0, mag)
 
 ! We want time to print only once (choose an arbitrary temperature)
-        if (temp == 2.5) then
+        if (temp == 25) then
            WRITE(16,*) mag, time
         endif
      enddo
 
-     WRITE(15,*) abs(mag), temp
+     WRITE(15,*) abs(mag), temp/10d0
   enddo
 
 !!! Close text files !!!                                                                                                                                                 
@@ -114,8 +115,8 @@ subroutine metropolis(spin, size, temp, mag)
   call random_number(r1)
   call random_number(r2)
 
-  ix = (r1*size)-1
-  iy = (r2*size)-1
+  ix = floor((r1*size))
+  iy = floor((r2*size))
 
 !! Calculate energy due to the neighbors (the modulo takes into account the boundaries)
   sl = spin(modulo(ix-1,size), iy)
@@ -135,7 +136,7 @@ subroutine metropolis(spin, size, temp, mag)
 !! Calculate magnetization  (quantifies how magnetic the material is)
   mag = sum(spin)/(size*size*1d0)
 
-end subroutine mainloop
+end subroutine
 
 !--------------------------------------------------------------------------------------------
 !! Open data files
