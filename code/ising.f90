@@ -33,9 +33,10 @@
 
 
 program ising
+
+  use plot
  
   implicit none
-
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Declarations !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -54,7 +55,7 @@ program ising
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Main Body !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+  plot_init
 
 !!! Open files for writing data !!!                                                                                                                                      
   call opentextfiles
@@ -73,18 +74,22 @@ program ising
 
     do time = 0,timefinal,timestep
         call metropolis(spin, size, temp/10d0, mag)
-
+        if (mod(time,25) .eq. 0) then
+          plot_spin(spin, size)
+        end if
 ! We want time to print only once (choose an arbitrary temperature)
         if (temp == 25) then
            WRITE(16,*) mag, time
-        endif
-     enddo
+        end if
+     end do
 
      WRITE(15,*) abs(mag), temp/10d0
-  enddo
+  end do
 
 !!! Close text files !!!                                                                                                                                                 
   call closetextfiles
+
+  plot_close
 
 contains
 
