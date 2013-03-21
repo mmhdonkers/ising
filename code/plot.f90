@@ -2,6 +2,8 @@ module plot
   use plplot
 
   implicit none
+
+  private numtostr
   
   public plot_init, plot_close, plot_spin
 
@@ -29,15 +31,16 @@ contains
     call plend()
   end subroutine
 
-  subroutine plot_spin(spin,size)
+  subroutine plot_spin(spin, size, temp)
     integer,intent(in) :: size
     integer,intent(in) :: spin(0:size-1,0:size-1)
+    real(8),intent(in) :: temp
 
     integer :: i, j
 
     call plcol0(7)
     call plenv(0d0, size*1d0, 0d0, size*1d0, 0, 0)
-    call pllab("x", "y", "spin")
+    call pllab("x", "y", "coupling constant: " // numtostr(1d0/temp))
 
     do i = 0, size - 1
       do j = 0, size - 1
@@ -53,5 +56,11 @@ contains
 
     call plspause(.false.)
   end subroutine
+
+  character(len=25) function numtostr(num) result(str)
+    real(8),intent(in) :: num
+
+    write(str, '(g12.5)') num
+  end function
 
 end module

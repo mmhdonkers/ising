@@ -64,7 +64,7 @@ program ising
 !! and the inner loop is the converging time loop 
 !!  (for plot of magnetization vs. time)
 
-  do temp = 0,tempfinal
+  do temp = 100,tempfinal
 
 ! Re-initialize the spin lattice for every temperature
     spin(:,:) = 1       
@@ -79,7 +79,7 @@ program ising
       end if
     end do
       
-    call plot_spin(spin, size)
+    call plot_spin(spin, size, temp/100d0)
     WRITE(15,*) abs(sum(spin)/(size**2*1d0)), temp/100d0
   end do
 
