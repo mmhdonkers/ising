@@ -43,10 +43,10 @@ contains
       do j = 0, size - 1
         if (spin(i,j) .eq. -1) then
           call plcol0(1)
-          call plstring([i + 0.5d0], [j + 0.5d0], '-')
+          call plpoin([i + 0.5d0], [j + 0.5d0], 31)
         else if (spin(i,j) .eq. 1) then
           call plcol0(2)
-          call plstring([i + 0.5d0], [j + 0.5d0], '+')
+          call plpoin([i + 0.5d0], [j + 0.5d0], 30)
         end if
       end do
     end do

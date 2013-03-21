@@ -43,13 +43,13 @@ program ising
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 !! INPUT: Final temperature (Kelvin x 100), final time, row and column size, stepsize loops
-  integer,parameter :: tempfinal = 400, timefinal = 100000, size = 20
+  integer,parameter :: tempfinal = 400, timefinal = 100000, size = 30
   integer,parameter :: tempstep = 1, timestep = 1
 
 
 !! fortran begins indexing from 1. Start it from 0 because the rand() starts from 0
   integer :: spin(0:size-1,0:size-1)
-  real(8) :: mag
+  real(8) :: mag, weight(-2:2)
   integer :: temp, time
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -70,18 +70,18 @@ program ising
 
 ! Re-initialize the spin lattice for every temperature
     spin(:,:) = 1       
-!    weight = 10*(/-8,-4,0,4,8/)/tempcount
+    weight = [exp(-800d0/temp),exp(-400d0/temp),1d0,exp(400d0/temp),exp(800d0/temp)]
 
     do time = 0,timefinal,timestep
-        call metropolis(spin, size, temp/100d0, mag)
+      call metropolis(spin, size, mag, weight)
 ! We want time to print only once (choose an arbitrary temperature)
-        if (temp == 250) then
-           WRITE(16,*) mag, time
-        end if
-     end do
-
-     call plot_spin(spin, size)
-     WRITE(15,*) abs(mag), temp/10d0
+      if (temp == 250) then
+        WRITE(16,*) mag, time
+      end if
+    end do
+      
+    call plot_spin(spin, size)
+    WRITE(15,*) abs(mag), temp/10d0
   end do
 
 !!! Close text files !!!                                                                                                                                                 
@@ -98,15 +98,14 @@ contains
 !--------------------------------------------------------------------------------------------
 !! Metropolis mainloop
 
-subroutine metropolis(spin, size, temp, mag)
+subroutine metropolis(spin, size, mag, weight)
 
   implicit none
 
 !! Passed parameters, intent(in) parameters cannot be altered
   integer,intent(in) :: size 
-  real(8),intent(in) :: temp
   integer,intent(inout) :: spin(0:size-1,0:size-1)
-  real(8),intent(out) :: mag
+  real(8),intent(out) :: mag, weight(-2:2)
 
 !! Subroutine variable declerations
   integer :: ix,iy
@@ -127,7 +126,7 @@ subroutine metropolis(spin, size, temp, mag)
   st = spin(ix, modulo(iy-1,size))
   sb = spin(ix, modulo(iy+1,size))
 
-  expo = exp(-2 * spin(ix,iy) * (sl + sr + st + sb)/temp)
+  expo = weight(-nint(0.5 * spin(ix,iy) * (sl + sr + st + sb)))
 
 !! Metropolis test
   call random_number(r3)
