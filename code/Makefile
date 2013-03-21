@@ -8,6 +8,7 @@ COMPILE = $(FC) $(FFLAGS)
 LINK = $(FC) $(LDFLAGS)
 
 OBJS = 
+OBJS += metropolis.o
 OBJS += plot.o
 OBJS += ising.o
 

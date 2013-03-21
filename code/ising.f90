@@ -34,6 +34,7 @@
 
 program ising
 
+  use metropolis
   use plot
  
   implicit none
@@ -44,13 +45,10 @@ program ising
 
 !! INPUT: Final temperature (Kelvin x 100), final time, row and column size, stepsize loops
   integer,parameter :: tempfinal = 400, timefinal = 100000, size = 30
-  integer,parameter :: tempstep = 1, timestep = 1
-
 
 !! fortran begins indexing from 1. Start it from 0 because the rand() starts from 0
-  integer :: spin(0:size-1,0:size-1)
-  real(8) :: mag, weight(-2:2)
-  integer :: temp, time
+  integer :: spin(0:size-1,0:size-1), temp, time
+  real(8) :: weight(-2:2)
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Main Body !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -66,27 +64,27 @@ program ising
 !! and the inner loop is the converging time loop 
 !!  (for plot of magnetization vs. time)
 
-  do temp = 0,tempfinal,tempstep
+  do temp = 0,tempfinal
 
 ! Re-initialize the spin lattice for every temperature
     spin(:,:) = 1       
+! Only 5 options for the exponent so calculate them once
     weight = [exp(-800d0/temp),exp(-400d0/temp),1d0,exp(400d0/temp),exp(800d0/temp)]
 
-    do time = 0,timefinal,timestep
-      call metropolis(spin, size, mag, weight)
+    do time = 0,timefinal
+      call metropolis(spin, size, weight)
 ! We want time to print only once (choose an arbitrary temperature)
       if (temp == 250) then
-        WRITE(16,*) mag, time
+        WRITE(16,*) sum(spin)/(size**2*1d0, time
       end if
     end do
       
     call plot_spin(spin, size)
-    WRITE(15,*) abs(mag), temp/10d0
+    WRITE(15,*) abs(sum(spin)/(size**2*1d0)), temp/100d0
   end do
 
 !!! Close text files !!!                                                                                                                                                 
   call closetextfiles
-
   call plot_close()
 
 contains
@@ -94,50 +92,6 @@ contains
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Subroutines !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-!--------------------------------------------------------------------------------------------
-!! Metropolis mainloop
-
-subroutine metropolis(spin, size, mag, weight)
-
-  implicit none
-
-!! Passed parameters, intent(in) parameters cannot be altered
-  integer,intent(in) :: size 
-  integer,intent(inout) :: spin(0:size-1,0:size-1)
-  real(8),intent(out) :: mag, weight(-2:2)
-
-!! Subroutine variable declerations
-  integer :: ix,iy
-  real(8) :: r1,r2,r3
-  real(8) :: expo
-  real(8) :: st, sb, sl, sr !neighbour cells
-
-!! Randomly choose a location in the array (the old spin)
-  call random_number(r1)
-  call random_number(r2)
-
-  ix = floor((r1*size))
-  iy = floor((r2*size))
-
-!! Calculate energy due to the neighbors (the modulo takes into account the boundaries)
-  sl = spin(modulo(ix-1,size), iy)
-  sr = spin(modulo(ix+1,size), iy)
-  st = spin(ix, modulo(iy-1,size))
-  sb = spin(ix, modulo(iy+1,size))
-
-  expo = weight(-nint(0.5 * spin(ix,iy) * (sl + sr + st + sb)))
-
-!! Metropolis test
-  call random_number(r3)
-
-  if (expo > r3) then
-    spin(ix,iy) = -spin(ix,iy)
-  endif
-
-!! Calculate magnetization  (quantifies how magnetic the material is)
-  mag = sum(spin)/(size*size*1d0)
-end subroutine
 
 !--------------------------------------------------------------------------------------------
 !! Open data files
