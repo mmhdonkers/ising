@@ -34,7 +34,7 @@
 
 program ising
 
-  use metropolis
+  use metrop
   use plot
  
   implicit none
@@ -75,7 +75,7 @@ program ising
       call metropolis(spin, size, weight)
 ! We want time to print only once (choose an arbitrary temperature)
       if (temp == 250) then
-        WRITE(16,*) sum(spin)/(size**2*1d0, time
+        WRITE(16,*) sum(spin)/(size**2*1d0), time
       end if
     end do
       

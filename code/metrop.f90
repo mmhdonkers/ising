@@ -1,7 +1,9 @@
-module metropolis
+module metrop
   implicit none
   
   public metropolis
+
+contains
 
   subroutine metropolis(spin, size, weight)
     !! Passed parameters, intent(in) parameters cannot be altered
