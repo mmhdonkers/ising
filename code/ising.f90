@@ -42,8 +42,8 @@ program ising
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Declarations !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-!! INPUT: Final temperature (Kelvin x 10), final time, row and column size, stepsize loops
-  integer,parameter :: tempfinal = 40, timefinal = 100000, size = 20
+!! INPUT: Final temperature (Kelvin x 100), final time, row and column size, stepsize loops
+  integer,parameter :: tempfinal = 400, timefinal = 100000, size = 20
   integer,parameter :: tempstep = 1, timestep = 1
 
 
@@ -55,7 +55,7 @@ program ising
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Main Body !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  plot_init
+  call plot_init()
 
 !!! Open files for writing data !!!                                                                                                                                      
   call opentextfiles
@@ -69,27 +69,25 @@ program ising
   do temp = 0,tempfinal,tempstep
 
 ! Re-initialize the spin lattice for every temperature
-    spin = 1       
+    spin(:,:) = 1       
 !    weight = 10*(/-8,-4,0,4,8/)/tempcount
 
     do time = 0,timefinal,timestep
-        call metropolis(spin, size, temp/10d0, mag)
-        if (mod(time,25) .eq. 0) then
-          plot_spin(spin, size)
-        end if
+        call metropolis(spin, size, temp/100d0, mag)
 ! We want time to print only once (choose an arbitrary temperature)
-        if (temp == 25) then
+        if (temp == 250) then
            WRITE(16,*) mag, time
         end if
      end do
 
+     call plot_spin(spin, size)
      WRITE(15,*) abs(mag), temp/10d0
   end do
 
 !!! Close text files !!!                                                                                                                                                 
   call closetextfiles
 
-  plot_close
+  call plot_close()
 
 contains
 
@@ -140,7 +138,6 @@ subroutine metropolis(spin, size, temp, mag)
 
 !! Calculate magnetization  (quantifies how magnetic the material is)
   mag = sum(spin)/(size*size*1d0)
-
 end subroutine
 
 !--------------------------------------------------------------------------------------------

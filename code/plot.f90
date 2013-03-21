@@ -1,13 +1,13 @@
 module plot
+  use plplot
+
   implicit none
   
   public plot_init, plot_close, plot_spin
 
 contains
 
-  function plot_init
-    use plplot
-
+  subroutine plot_init() 
     call plsdev("xcairo")
 
     call plscol0(0, 255, 255, 255)  ! white
@@ -22,33 +22,35 @@ contains
     call plscol0(9, 128, 128, 128)  ! gray
 
     call plinit()
-  end function
+  end subroutine
 
-  function plot_close
+  subroutine plot_close()
     call plspause(.false.)
     call plend()
-  end function
+  end subroutine
 
-  function plot_spin(spin,size)
+  subroutine plot_spin(spin,size)
     integer,intent(in) :: spin(:,:), size
 
     integer :: i, j
 
     call plcol0(7)
-    call plenv(0, size, 0, size, 0, 0)
+    call plenv(0d0, size*1d0, 0d0, size*1d0, 0, 0)
     call pllab("x", "y", "spin")
 
     do i = 0, size - 1
       do j = 0, size - 1
         if (spin(i,j) .eq. -1) then
-          plcol0(1)
-          plpoin(i + 0.5d0, j + 0.5d0, 2)
+          call plcol0(1)
+          call plstring([i + 0.5d0], [j + 0.5d0], '-')
         else if (spin(i,j) .eq. 1) then
-          plcol0(2)
-          plpoin(i + 0.5d0, j + 0.5d0, 2)
+          call plcol0(2)
+          call plstring([i + 0.5d0], [j + 0.5d0], '+')
         end if
       end do
     end do
-  end function
+
+    call plspause(.false.)
+  end subroutine
 
 end module
