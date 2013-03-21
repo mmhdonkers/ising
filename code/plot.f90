@@ -30,7 +30,8 @@ contains
   end subroutine
 
   subroutine plot_spin(spin,size)
-    integer,intent(in) :: spin(:,:), size
+    integer,intent(in) :: size
+    integer,intent(in) :: spin(0:size-1,0:size-1)
 
     integer :: i, j
 

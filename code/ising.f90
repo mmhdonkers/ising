@@ -105,7 +105,7 @@ subroutine metropolis(spin, size, temp, mag)
 !! Passed parameters, intent(in) parameters cannot be altered
   integer,intent(in) :: size 
   real(8),intent(in) :: temp
-  integer,intent(inout) :: spin(:,:)
+  integer,intent(inout) :: spin(0:size-1,0:size-1)
   real(8),intent(out) :: mag
 
 !! Subroutine variable declerations
