@@ -31,19 +31,19 @@ contains
     call plend()
   end subroutine
 
-  subroutine plot_spin(spin, size, temp)
-    integer,intent(in) :: size
-    integer,intent(in) :: spin(0:size-1,0:size-1)
+  subroutine plot_spin(spin, SIZE, temp)
+    integer,intent(in) :: SIZE
+    integer,intent(in) :: spin(0:SIZE-1,0:SIZE-1)
     real(8),intent(in) :: temp
 
     integer :: i, j
 
     call plcol0(7)
-    call plenv(0d0, size*1d0, 0d0, size*1d0, 0, 0)
+    call plenv(0d0, SIZE*1d0, 0d0, SIZE*1d0, 0, 0)
     call pllab("x", "y", "coupling constant: " // numtostr(1d0/temp))
 
-    do i = 0, size - 1
-      do j = 0, size - 1
+    do i = 0, SIZE - 1
+      do j = 0, SIZE - 1
         if (spin(i,j) .eq. -1) then
           call plcol0(1)
           call plpoin([i + 0.5d0], [j + 0.5d0], 31)
