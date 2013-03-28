@@ -1,7 +1,8 @@
-module metrop
+module model
   implicit none
   
-  public metropolis
+  private growcluster, tryadd
+  public metropolis, swenwang
 
 contains
 
@@ -21,8 +22,8 @@ contains
     call random_number(r1)
     call random_number(r2)
  
-    ix = floor((r1*SIZE))
-    iy = floor((r2*SIZE))
+    ix = floor(r1*SIZE)
+    iy = floor(r2*SIZE)
  
     !! Calculate energy due to the neighbors 
     !!  (the modulo takes into account the boundaries)
@@ -39,5 +40,32 @@ contains
     if (expo > r3) then
       spin(ix,iy) = -spin(ix,iy)
     endif
+  end subroutine
+
+  subroutine swenwang(spin, SIZE, temp)
+    !! Passed parameters, intent(in) parameters cannot be altered
+    integer,intent(in) :: SIZE
+    real(8),intent(in) :: temp
+    integer,intent(inout) :: spin(0:SIZE-1,0:SIZE-1)
+
+    !! Subroutine variable declerations
+    real(8) :: r1(0:SIZE-1,0:SIZE-1),r2(0:SIZE-1,0:SIZE-1)
+    logical :: bonds(0:SIZE-1,0:SIZE-1,2)
+    logical :: mark(0:SIZE-1,0:SIZE-1)
+
+    call random_number(r1)
+    call random_number(r2)
+
+    bonds(:,:,1) = (r1 < (1 - exp(-2/temp))*spin*cshift(spin,shift=1,dim=2))
+    bonds(:,:,2) = (r2 < (1 - exp(-2/temp))*spin*cshift(spin,shift=1,dim=1))
+
+  end subroutine
+
+  subroutine growcluster()
+
+  end subroutine
+
+  subroutine tryadd()
+
   end subroutine
 end module

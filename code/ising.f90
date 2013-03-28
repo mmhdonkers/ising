@@ -34,8 +34,7 @@
 
 program ising
 
-!  use wolff  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! UNCOMMENT !!!!!!!!!!!!!!!!!!!!! UNCOMMENT !!!!!!!!!!!!!!!!!!!!!
-  use metrop
+  use model
   use plot
  
   implicit none
@@ -90,8 +89,6 @@ program ising
 ! Only 5 options for the exponent so calculate them once
     weight = [exp(-800d0/temp),exp(-400d0/temp),1d0,exp(400d0/temp),exp(800d0/temp)]
 
-
-
 ! Re-initialize Wolff lattice. All value in lattice must be 1 or -1
     call random_number(randreal)
     wolffspin = nint(randreal)
@@ -104,7 +101,7 @@ program ising
        enddo
     enddo
 
-
+    call swenwang(wolffspin, SIZE, temp/100d0)
 
     do time = 0,TIMEFINAL
       call metropolis(spin, SIZE, weight)

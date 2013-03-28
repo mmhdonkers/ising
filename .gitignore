@@ -4,4 +4,4 @@
 *.log
 *.mod
 code/run
-mag*.txt
+*mag*.txt
