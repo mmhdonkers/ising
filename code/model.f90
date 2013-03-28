@@ -2,7 +2,7 @@ module model
   implicit none
   
   private growcluster, tryadd, backtrack
-  public metropolis, swenwang
+  public metropolis, swenwang, wolff
 
 contains
 
@@ -63,33 +63,78 @@ contains
       do iy = 0, SIZE - 1
         call random_number(r3)
         newspin = (2 * nint(r3) - 1) * spin(ix, iy)
-        call backtrack(ix, iy, SIZE, bonds, mark, spin, newspin)
+        call backtrack(spin, SIZE, ix, iy, bonds, mark, newspin)
       enddo
     enddo
   end subroutine
 
-  recursive subroutine backtrack(ix, iy, SIZE, bonds, mark, spin, newspin)
-    !! Pased parameters, intent(in) parameters cannor be altered
+  recursive subroutine backtrack(spin, SIZE, ix, iy, bonds, mark, newspin)
+    !! Passed parameters, intent(in) parameters cannot be altered
     integer,intent(in) :: ix, iy, SIZE, newspin
-    logical,intent(in) :: bonds(0:SIZE-1,0:SIZE-1,2)
-    integer,intent(inout) :: spin(0:SIZE-1,0:SIZE-1)
-    logical,intent(inout) :: mark(0:SIZE-1,0:SIZE-1)
+    logical,intent(in) :: bonds(0:SIZE-1, 0:SIZE-1, 2)
+    integer,intent(inout) :: spin(0:SIZE-1, 0:SIZE-1)
+    logical,intent(inout) :: mark(0:SIZE-1, 0:SIZE-1)
 
     if (.NOT. mark(ix, iy)) then
-      mark(ix, iy) = .true.
+      mark(ix, iy) = .TRUE.
       spin(ix, iy) = newspin
-      if (bonds(ix, iy, 1)) call backtrack(modulo(ix + 1, SIZE), iy, SIZE, bonds, mark, spin, newspin)
-      if (bonds(ix, iy, 2)) call backtrack(ix, modulo(iy - 1, SIZE), SIZE, bonds, mark, spin, newspin)
-      if (bonds(modulo(ix - 1, SIZE), iy, 1)) call backtrack(modulo(ix - 1, SIZE), iy, SIZE, bonds, mark, spin, newspin)
-      if (bonds(ix, modulo(iy + 1, SIZE), 2)) call backtrack(ix, modulo(iy + 1, SIZE), SIZE, bonds, mark, spin, newspin)
+      if (bonds(ix, iy, 1)) call backtrack(spin, SIZE, modulo(ix + 1, SIZE), iy, bonds, mark, newspin)
+      if (bonds(ix, iy, 2)) call backtrack(spin ,SIZE, ix, modulo(iy - 1, SIZE), bonds, mark, newspin)
+      if (bonds(modulo(ix - 1, SIZE), iy, 1)) call backtrack(spin, SIZE, modulo(ix - 1, SIZE), iy, bonds, mark, newspin)
+      if (bonds(ix, modulo(iy + 1, SIZE), 2)) call backtrack(spin, SIZE, ix, modulo(iy + 1, SIZE), bonds, mark, newspin)
     endif
   end subroutine
 
-  subroutine growcluster()
+  subroutine wolff(spin, SIZE, temp)
+    !! Passed parameters, intent(in) parameters cannot be altered
+    integer,intent(in) :: SIZE
+    real(8),intent(in) :: temp
+    integer,intent(inout) :: spin(0:SIZE-1,0:SIZE-1)
 
+    !! Subroutine variable declerations
+    integer :: ix, iy
+    real(8) :: r1, r2
+    logical :: mark(0:SIZE-1,0:SIZE-1)
+
+    call random_number(r1)
+    call random_number(r2)
+
+    ix = floor(r1*SIZE)
+    iy = floor(r2*SIZE)
+
+    call growcluster(spin, SIZE, ix, iy, temp, mark, -spin(ix, iy))
   end subroutine
 
-  subroutine tryadd()
+  subroutine growcluster(spin, SIZE, ix, iy, temp, mark, newspin)
+    !! Passed parameters, intent(in) parameters cannot be altered
+    integer,intent(in) :: SIZE, ix, iy, newspin
+    real(8),intent(in) :: temp
+    integer,intent(inout) :: spin(0:SIZE-1, 0:SIZE-1)
+    logical,intent(inout) :: mark(0:SIZE-1, 0:SIZE-1)
 
+    spin(ix, iy) = newspin
+    mark(ix, iy) = .TRUE.
+    if (.NOT. mark(modulo(ix + 1, SIZE), iy)) call tryadd(spin, SIZE, ix, iy, temp, mark, newspin)
+    if (.NOT. mark(modulo(ix - 1, SIZE), iy)) call tryadd(spin, SIZE, ix, iy, temp, mark, newspin)
+    if (.NOT. mark(ix, modulo(iy + 1, SIZE))) call tryadd(spin, SIZE, ix, iy, temp, mark, newspin)
+    if (.NOT. mark(ix, modulo(iy - 1, SIZE))) call tryadd(spin, SIZE, ix, iy, temp, mark, newspin)
+  end subroutine
+
+  subroutine tryadd(spin, SIZE, ix, iy, temp, mark, newspin)
+    !! Passed parameters, intent(in) paramters cannot be altered
+    integer,intent(in) :: SIZE, ix, iy, newspin
+    real(8),intent(in) :: temp
+    integer,intent(inout) :: spin(0:SIZE-1, 0:SIZE-1)
+    logical,intent(inout) :: mark(0:SIZE-1, 0:SIZE-1)
+
+    !! Subroutine variable declerations
+    real(8) :: r1
+
+    if (spin(ix, iy) /= newspin) then
+      call random_number(r1)
+      if (r1 < (1 - exp(-2 / temp))) then
+        call growcluster(spin, SIZE, ix, iy, temp, mark, newspin)
+      end if
+    end if
   end subroutine
 end module
