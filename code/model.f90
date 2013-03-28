@@ -1,7 +1,7 @@
 module model
   implicit none
   
-  private growcluster, tryadd
+  private growcluster, tryadd, backtrack
   public metropolis, swenwang
 
 contains
@@ -49,9 +49,9 @@ contains
     integer,intent(inout) :: spin(0:SIZE-1,0:SIZE-1)
 
     !! Subroutine variable declerations
-    real(8) :: r1(0:SIZE-1,0:SIZE-1),r2(0:SIZE-1,0:SIZE-1)
-    logical :: bonds(0:SIZE-1,0:SIZE-1,2)
-    logical :: mark(0:SIZE-1,0:SIZE-1)
+    integer :: ix, iy, newspin
+    real(8) :: r1(0:SIZE-1,0:SIZE-1), r2(0:SIZE-1,0:SIZE-1), r3
+    logical :: bonds(0:SIZE-1,0:SIZE-1,2), mark(0:SIZE-1,0:SIZE-1)
 
     call random_number(r1)
     call random_number(r2)
@@ -59,6 +59,30 @@ contains
     bonds(:,:,1) = (r1 < (1 - exp(-2/temp))*spin*cshift(spin,shift=1,dim=2))
     bonds(:,:,2) = (r2 < (1 - exp(-2/temp))*spin*cshift(spin,shift=1,dim=1))
 
+    do ix = 0, SIZE - 1
+      do iy = 0, SIZE - 1
+        call random_number(r3)
+        newspin = (2 * nint(r3) - 1) * spin(ix, iy)
+        call backtrack(ix, iy, SIZE, bonds, mark, spin, newspin)
+      enddo
+    enddo
+  end subroutine
+
+  recursive subroutine backtrack(ix, iy, SIZE, bonds, mark, spin, newspin)
+    !! Pased parameters, intent(in) parameters cannor be altered
+    integer,intent(in) :: ix, iy, SIZE, newspin
+    logical,intent(in) :: bonds(0:SIZE-1,0:SIZE-1,2)
+    integer,intent(inout) :: spin(0:SIZE-1,0:SIZE-1)
+    logical,intent(inout) :: mark(0:SIZE-1,0:SIZE-1)
+
+    if (.NOT. mark(ix, iy)) then
+      mark(ix, iy) = .true.
+      spin(ix, iy) = newspin
+      if (bonds(ix, iy, 1)) call backtrack(modulo(ix + 1, SIZE), iy, SIZE, bonds, mark, spin, newspin)
+      if (bonds(ix, iy, 2)) call backtrack(ix, modulo(iy - 1, SIZE), SIZE, bonds, mark, spin, newspin)
+      if (bonds(modulo(ix - 1, SIZE), iy, 1)) call backtrack(modulo(ix - 1, SIZE), iy, SIZE, bonds, mark, spin, newspin)
+      if (bonds(ix, modulo(iy + 1, SIZE), 2)) call backtrack(ix, modulo(iy + 1, SIZE), SIZE, bonds, mark, spin, newspin)
+    endif
   end subroutine
 
   subroutine growcluster()

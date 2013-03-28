@@ -57,10 +57,10 @@ program ising
 !!!!!!!!!!!!! Metropolis Declarations !!!!!!!!!!!!!!!!
 
 !! INPUT: Final temperature (Kelvin x 100), final time, stepsizeloops
-  integer,parameter :: TEMPFINAL = 400, TIMEFINAL = 100000
+  integer,parameter :: TEMPFINAL = 300, TIMEFINAL = 10000
 
 !! fortran begins indexing from 1. Start it from 0 because the rand() starts from 0
-  integer :: spin(0:SIZE-1,0:SIZE-1), temp, time, i, j
+  integer :: spin(0:SIZE-1,0:SIZE-1), temp, time
   real(8) :: weight(-2:2)
 
 
@@ -91,15 +91,7 @@ program ising
 
 ! Re-initialize Wolff lattice. All value in lattice must be 1 or -1
     call random_number(randreal)
-    wolffspin = nint(randreal)
-
-    do i=0, SIZE
-       do j=0, SIZE
-          if (wolffspin(i,j) == 0) then
-             wolffspin(i,j) = -1
-          endif
-       enddo
-    enddo
+    wolffspin = 2*nint(randreal)-1
 
     call swenwang(wolffspin, SIZE, temp/100d0)
 
@@ -117,9 +109,8 @@ program ising
       
     call plot_spin(spin, SIZE, temp/100d0)
     WRITE(15,*) abs(sum(spin)/(SIZE**2*1d0)), temp/100d0
-!   WRITE(17,*) abs(sum(wolffspin)/(SIZE**2*1d0)), temp/100d0 !!!!!!!!!!!!!!!!! UNCOMMENT !!!!!!!!!!!!!!! UNCOMMENT !!!!!!!!!!!!!!!!
+    WRITE(17,*) abs(sum(wolffspin)/(SIZE**2*1d0)), temp/100d0 !!!!!!!!!!!!!!!!! UNCOMMENT !!!!!!!!!!!!!!! UNCOMMENT !!!!!!!!!!!!!!!!
   end do
-
 !!! Close text files !!!                                                                                                                                                 
   call closetextfiles
   call plot_close()
@@ -141,11 +132,11 @@ subroutine opentextfiles
        STOP "------------Error, metrop_mag_time file not opened properly------------"
     endif
 
-    OPEN(UNIT=17,FILE="wolff_mag_temp.txt",STATUS="REPLACE",IOSTAT=OPEN_STATUS)
+    OPEN(UNIT=17,FILE="swenwang_mag_temp.txt",STATUS="REPLACE",IOSTAT=OPEN_STATUS)
     if (OPEN_STATUS /= 0) then
        STOP "------------Error, wolff_mag_temp file not opened properly------------"
     endif
-    OPEN(UNIT=18,FILE="wolff_mag_time.txt",STATUS="REPLACE",IOSTAT=OPEN_STATUS)
+    OPEN(UNIT=18,FILE="swenwang_mag_time.txt",STATUS="REPLACE",IOSTAT=OPEN_STATUS)
     if (OPEN_STATUS /= 0) then
        STOP "------------Error, wolff_mag_time file not opened properly------------"
     endif

@@ -4,7 +4,6 @@ module plot
   implicit none
 
   private numtostr
-  
   public plot_init, plot_close, plot_spin
 
 contains
