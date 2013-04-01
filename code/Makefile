@@ -25,10 +25,9 @@ LINK = $(FC) $(LDFLAGS)
 
 # Files (modules) to link to main program
 OBJS = 
-OBJS += metrop.o
+OBJS += model.o
 OBJS += plot.o
 OBJS += ising.o
-OBJS += wolff.o
 
 all: run
 

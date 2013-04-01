@@ -97,7 +97,7 @@ in numerous applications such as approximation of multi-dimensional distribution
 The outline of the mainloop of Metropolis algorithm, as applied to the Ising model, is as follows:
 \newline
 
-(i) Choose a spin randomly.
+(i) Randomly choose a location in the lattice randomly.
 \newline
 
 (ii) Calculate the energy difference $\delta E$ between the spin up and spin down orientations.
@@ -125,24 +125,49 @@ range of values.  The size of this ``smallness'' is determined by the needs of t
 \subsection*{Cluster Algorithms}
 
 
-In the above described Metropolis algorithm, spins are flipped individually, which is computationally expensive.
-In the late 1980s, research began on new algorithms that would flip clusters of spins as opposed
-to flipping individual spins.  In these methods, the difficulty is in creating a method that effeciently and effectively
-identifies the appropriate clusters to be flipped.  In the case of the Ising model, the clusters are continuous groups
+In the above Metropolis algorithm, one randomly selected spin is updated (flipped or not flipped) for each sweep across the 
+entire spin lattice, which is computationally expensive. Also, at temperatures near the critical temperature, there is a large
+increase in fluctuations in total magnetization and total energy, which requres more measurements to reduce the statistical noise.
+
+
+In the late 1980s, research began on new algorithms that would reduce the two issues stated in the previous paragraph.
+This would be achieved by updating clusters of spins for each sweep across the lattice.  
+In these methods, the difficulty is in creating a method that effeciently and effectively
+identifies the appropriate clusters to be updated.  In the case of the Ising model, the clusters are continuous groups
 of particles with the same spin orientation.
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection*{Swendsen-Wang Algorithm}
-
-Outline basic algorithm.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection*{Wolff Algorithm}
 
+In the Wolff algorithm, a single cluster is updated for each sweep of the lattice.
 
-Outline basic algorithm.
+
+The outline of the algorithm as it is applied to the Ising model is as follows:
+\newline
+
+(i) Randomly choose a location in the lattice randomly.
+\newline
+
+(ii) There are eight nearest-neighbor locations to the randomly selected location.  Choose a nearest-neighbor location
+of the same orientation as the spin in the first selected location.  The choice does not have to be random.
+\newline
+
+(iii) Let $x$ be a random number on the internal $[0,1]$. If $1 - e^{\frac{2J}{u_{\beta}T}} > x$, then add the 
+nearest-neighbor spin to the cluster.
+\newline
+
+(iv) After growing the cluster to completion, flip the cluster.
+\newline
+
+(v) Continue 
+\newline
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Swendsen-Wang Algorithm}
+
+Unlike the Wolff algorith, the Swendsen-Wang algorithm updates multiple clusters for each sweep of the lattice.
 
 
 
@@ -150,10 +175,42 @@ Outline basic algorithm.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Simulations and Results}
 
+We ran simulations of the ising model for all three algorithms: Metropolis, Wolff, and Swendsen-Wang.
+The purpose of these simulations is to investigate the Magnetization as a function of both time and temperature
+for different computational algorithms.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Metropolis Algorithm}
+
+The following plot is magnetization versus time.  For this plot, we chose a temperature of 2.5.  
+Note that the critical temperature for phase transition is 2.3.
+
+\includegraphics[width=1\textwidth]{images/metrop_mag_time.png}
+
+
+The following plot
+
+\includegraphics[width=1\textwidth]{images/metrop_mag_temp.png}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Cluster Algorithms}
+
+The following plot is for the Swendsen-Wang Algorithm.
+
+\includegraphics[width=1\textwidth]{images/swenwang_mag_temp.png}
 
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Wolff Algorithm}
+
+The following plot is for the Wolff Algorithm.
+
+\includegraphics[width=1\textwidth]{images/wolff_mag_temp.png}
 
 
 
