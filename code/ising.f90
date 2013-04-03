@@ -136,11 +136,11 @@ subroutine opentextfiles
 
     OPEN(UNIT=17,FILE="swenwang_mag_temp.txt",STATUS="REPLACE",IOSTAT=OPEN_STATUS)
     if (OPEN_STATUS /= 0) then
-       STOP "------------Error, wolff_mag_temp file not opened properly------------"
+       STOP "------------Error, swenwang_mag_temp file not opened properly------------"
     endif
     OPEN(UNIT=18,FILE="wolff_mag_temp.txt",STATUS="REPLACE",IOSTAT=OPEN_STATUS)
     if (OPEN_STATUS /= 0) then
-       STOP "------------Error, wolff_mag_time file not opened properly------------"
+       STOP "------------Error, wolff_mag_temp file not opened properly------------"
     endif
 end subroutine
 
