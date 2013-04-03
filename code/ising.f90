@@ -76,13 +76,13 @@ program ising
 
 ! Re-initialize Wolff lattice. All values in the lattice must be 1
     wolffspin(:,:) = 1
-    do time = 0, 500
+    do time = 0, 100
       call wolff(wolffspin, SIZE, temp/100d0)
     end do
     
 ! Re-initialize Swendswon-Wang lattice. All values in the lattice must be 1
     swenwangspin(:,:) = 1
-    do time = 0, 500
+    do time = 0, 400
       call swenwang(swenwangspin, SIZE, temp/100d0)
     end do
 

@@ -107,9 +107,9 @@ contains
 
   subroutine growcluster(spin, SIZE, ix, iy, temp, mark, newspin)
     !! Passed parameters, intent(in) parameters cannot be altered
-    integer,intent(in) :: SIZE, ix, iy, newspin
+    integer,intent(in) :: SIZE, newspin
     real(8),intent(in) :: temp
-    integer,intent(inout) :: spin(0:SIZE-1, 0:SIZE-1)
+    integer :: spin(0:SIZE-1, 0:SIZE-1), ix, iy
     logical,intent(inout) :: mark(0:SIZE-1, 0:SIZE-1)
 
     spin(ix, iy) = newspin
@@ -122,9 +122,9 @@ contains
 
   subroutine tryadd(spin, SIZE, ix, iy, temp, mark, newspin)
     !! Passed parameters, intent(in) paramters cannot be altered
-    integer,intent(in) :: SIZE, ix, iy, newspin
+    integer,intent(in) :: SIZE, newspin
     real(8),intent(in) :: temp
-    integer,intent(inout) :: spin(0:SIZE-1, 0:SIZE-1)
+    integer :: spin(0:SIZE-1, 0:SIZE-1), ix, iy
     logical,intent(inout) :: mark(0:SIZE-1, 0:SIZE-1)
 
     !! Subroutine variable declerations
