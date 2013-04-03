@@ -44,25 +44,16 @@ program ising
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 !! INPUT: Row and column size
-  integer,parameter :: SIZE = 30
-
-
-!!!!!!!!!!!!! Wolff Declarations !!!!!!!!!!!!!!!!!!!!!
-
-!! array of random reals and random integers (spins)
-  real :: randreal(0:SIZE-1, 0:SIZE-1)
-  integer :: wolffspin(0:SIZE-1, 0:SIZE-1)
-  integer :: swenwangspin(0:SIZE-1, 0:SIZE-1)
-
-!!!!!!!!!!!!! Metropolis Declarations !!!!!!!!!!!!!!!!
+  integer,parameter :: SIZE = 32
 
 !! INPUT: Final temperature (Kelvin x 100), final time, stepsizeloops
-  integer,parameter :: TEMPFINAL = 300, TIMEFINAL = 10000
+  integer,parameter :: TEMPFINAL = 400, TIMEFINAL = 10000
 
 !! fortran begins indexing from 1. Start it from 0 because the rand() starts from 0
   integer :: spin(0:SIZE-1,0:SIZE-1), temp, time
   real(8) :: weight(-2:2)
-
+  integer :: wolffspin(0:SIZE-1, 0:SIZE-1)
+  integer :: swenwangspin(0:SIZE-1, 0:SIZE-1)
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! Main Body !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -81,23 +72,24 @@ program ising
 !!  (for plot of magnetization vs. time)
 
 
-  do temp = 0,TEMPFINAL
+  do temp = 100,TEMPFINAL
 
-! Re-initialize the Metropolis lattice
-    spin(:,:) = 1       
-
-! Only 5 options for the exponent so calculate them once
-    weight = [exp(-800d0/temp),exp(-400d0/temp),1d0,exp(400d0/temp),exp(800d0/temp)]
-
-! Re-initialize Wolff lattice. All value in lattice must be 1 or -1
-    call random_number(randreal)
-    wolffspin = 2*nint(randreal)-1
-    call wolff(wolffspin, SIZE, temp/100d0)
+! Re-initialize Wolff lattice. All values in the lattice must be 1
+    wolffspin(:,:) = 1
+    do time = 0, 500
+      call wolff(wolffspin, SIZE, temp/100d0)
+    end do
     
-    call random_number(randreal)
-    swenwangspin = 2*nint(randreal)-1
-    call swenwang(swenwangspin, SIZE, temp/100d0)
+! Re-initialize Swendswon-Wang lattice. All values in the lattice must be 1
+    swenwangspin(:,:) = 1
+    do time = 0, 500
+      call swenwang(swenwangspin, SIZE, temp/100d0)
+    end do
 
+! Re-initialize the Metropolis lattice. All values in the lattice must be 1
+    spin(:,:) = 1       
+! Only 5 options for the exponent for metropolis so calculate them once
+    weight = [exp(-800d0/temp),exp(-400d0/temp),1d0,exp(400d0/temp),exp(800d0/temp)]
     do time = 0,TIMEFINAL
       call metropolis(spin, SIZE, weight)
 

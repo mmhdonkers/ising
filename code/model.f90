@@ -114,10 +114,10 @@ contains
 
     spin(ix, iy) = newspin
     mark(ix, iy) = .TRUE.
-    if (.NOT. mark(modulo(ix + 1, SIZE), iy)) call tryadd(spin, SIZE, ix, iy, temp, mark, newspin)
-    if (.NOT. mark(modulo(ix - 1, SIZE), iy)) call tryadd(spin, SIZE, ix, iy, temp, mark, newspin)
-    if (.NOT. mark(ix, modulo(iy + 1, SIZE))) call tryadd(spin, SIZE, ix, iy, temp, mark, newspin)
-    if (.NOT. mark(ix, modulo(iy - 1, SIZE))) call tryadd(spin, SIZE, ix, iy, temp, mark, newspin)
+    if (.NOT.(mark(modulo(ix + 1, SIZE), iy))) call tryadd(spin, SIZE, modulo(ix + 1, SIZE), iy, temp, mark, newspin)
+    if (.NOT.(mark(modulo(ix - 1, SIZE), iy))) call tryadd(spin, SIZE, modulo(ix - 1, SIZE), iy, temp, mark, newspin)
+    if (.NOT.(mark(ix, modulo(iy + 1, SIZE)))) call tryadd(spin, SIZE, ix, modulo(iy + 1, SIZE), temp, mark, newspin)
+    if (.NOT.(mark(ix, modulo(iy - 1, SIZE)))) call tryadd(spin, SIZE, ix, modulo(iy - 1, SIZE), temp, mark, newspin)
   end subroutine
 
   subroutine tryadd(spin, SIZE, ix, iy, temp, mark, newspin)
