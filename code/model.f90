@@ -59,6 +59,8 @@ contains
     bonds(:,:,1) = (r1 < (1 - exp(-2/temp))*spin*cshift(spin,shift=1,dim=2))
     bonds(:,:,2) = (r2 < (1 - exp(-2/temp))*spin*cshift(spin,shift=1,dim=1))
 
+    mark = .FALSE.
+
     do ix = 0, SIZE - 1
       do iy = 0, SIZE - 1
         call random_number(r3)
@@ -101,6 +103,8 @@ contains
 
     ix = floor(r1*SIZE)
     iy = floor(r2*SIZE)
+
+    mark = .FALSE.
 
     call growcluster(spin, SIZE, ix, iy, temp, mark, -spin(ix, iy))
   end subroutine
